@@ -1,2 +1,4 @@
 env/
 sftp-config.json
+*.py[cod]
+__pycache__/
