@@ -3,12 +3,12 @@ watch-tv - watch some TV pulled from various online sources
 """
 
 from flask import Flask
-import backends
+import directories
 import importlib
 import pkgutil
 
 app = Flask(__name__)
-backendList = []
+directoryList = []
 
 @app.route("/")
 def hello_world():
@@ -16,13 +16,13 @@ def hello_world():
 
 @app.route("/search/<q>")
 def search(q):
-	# Go through all the backends to search for the query
+	# Go through all the directories to search for the query
 	# Try to merge results if they are the same
 	# Cache merged results?
 	results = {}
 	a = ""
 
-	for b in backendList:
+	for b in directoryList:
 		results[b.id] = b.search(q)
 	for k in results:
 		a += " {} -> {}".format(k, results[k])
@@ -31,14 +31,14 @@ def search(q):
 
 @app.route("/show/<showID>")
 def show(showID):
-	# ID should be unique per backend
+	# ID should be unique per directory
 	# Requesting an ID should get an aggregate of
-	# all the results from all the different backends
-	# an ID from any backend should be able to refer to the aggregate
+	# all the results from all the different directories
+	# an ID from any directory should be able to refer to the aggregate
 	results = {}
 	a = ""
 
-	for b in backendList:
+	for b in directoryList:
 		results[b.id] = b.getShow(showID)
 
 	for k in results:
@@ -47,12 +47,12 @@ def show(showID):
 	return a
 
 def initBackends():
-	for importer, mod, isPkg in pkgutil.iter_modules(backends.__path__):
+	for importer, mod, isPkg in pkgutil.iter_modules(directories.__path__):
 		try:
-			backendList.append(importlib.import_module("backends." + mod))
-			print("Imported backend: {}".format(mod))
+			directoryList.append(importlib.import_module("directories." + mod))
+			print("Imported directory: {}".format(mod))
 		except:
-			print("Failed to import backend: {}".format(mod))
+			print("Failed to import directory: {}".format(mod))
 
 if __name__ == "__main__":
 	initBackends()
