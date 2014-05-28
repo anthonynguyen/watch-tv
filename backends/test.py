@@ -14,6 +14,9 @@ EPISODE_URL = "http://www.watchseries.to/episode/{}.html" # e.g. how_i_met_your_
 VIDEO_AD_URL = "http://www.watchseries.to/open/cale/{}.html" # e.g. 1289651
 
 SEARCH_RE = re.compile(r"\<a href=\"/serie/(.+?)\" title=\"(.+?)\"\>")
+SHOW_RE = re.compile(r"\<a href=\"/episode/(.+?)\.html\"\>") # the_mentalist_s1_e1
+
+
 
 def search(query):
 	results = {}
@@ -28,9 +31,22 @@ def search(query):
 
 
 def getShow(showID): # showID -> e.g. how_i_met_your_mother
-	# Ideally, getShow would return a list of lists of episode links
+	results = []
 
-	pass
+	req = urllib.request.urlopen(SHOW_URL.format(showID))
+	data = req.read().decode("utf-8")
+
+	SHOWNAME_RE = re.compile(r"{}_s(\d+)_e\d+".format(showID))
+
+	for m in SHOW_RE.finditer(data):
+		match = SHOWNAME_RE.search(m.group(1))
+		season = int(match.group(1))
+		if len(results) < season:
+			results.append([m.group(1)])
+		else:
+			results[season - 1].append(m.group(1))
+
+	return results
 
 def getEpisode():
 	pass

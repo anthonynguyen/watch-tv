@@ -21,19 +21,30 @@ def search(q):
 	# Cache merged results?
 	results = {}
 	a = ""
+
 	for b in backendList:
 		results[b.id] = b.search(q)
 	for k in results:
 		a += " {} -> {}".format(k, results[k])
+
 	return a
 
-@app.route("/show/<int:id>")
-def show(id):
+@app.route("/show/<showID>")
+def show(showID):
 	# ID should be unique per backend
 	# Requesting an ID should get an aggregate of
 	# all the results from all the different backends
 	# an ID from any backend should be able to refer to the aggregate
-	pass
+	results = {}
+	a = ""
+
+	for b in backendList:
+		results[b.id] = b.getShow(showID)
+
+	for k in results:
+		a += " {} -> {}".format(k, results[k])
+	
+	return a
 
 def initBackends():
 	for importer, mod, isPkg in pkgutil.iter_modules(backends.__path__):
