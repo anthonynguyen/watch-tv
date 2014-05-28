@@ -1,6 +1,6 @@
 """
 Backend file for interfacing with online TV episode aggregators
-This test backend is currently set up to use watchseries
+This backend is for watchseries
 """
 
 import re
