@@ -16,6 +16,7 @@ VIDEO_AD_URL = "http://www.watchseries.to/open/cale/{}.html" # e.g. 1289651
 SEARCH_RE = re.compile(r"\<a href=\"/serie/(.+?)\" title=\"(.+?)\"\>")
 SHOW_RE = re.compile(r"\<a href=\"/episode/(.+?)\.html\"\>") # the_mentalist_s1_e1
 
+EPISODE_LINK_RE = re.compile(r"\<a target=\"_blank\" href=\"/open/cale/(\d+)\.html\" class=\"buttonlink\" title=\"(.+?)\"")
 
 
 def search(query):
@@ -30,7 +31,7 @@ def search(query):
 	return results
 
 
-def getShow(showID): # showID -> e.g. how_i_met_your_mother
+def getShow(showID): # showID -> how_i_met_your_mother
 	results = []
 
 	req = urllib.request.urlopen(SHOW_URL.format(showID))
@@ -48,5 +49,23 @@ def getShow(showID): # showID -> e.g. how_i_met_your_mother
 
 	return results
 
-def getEpisode():
+def getEpisode(episodeID): # episodeID -> how_i_met_your_mother_s2_e12
+	results = {}
+
+	req = urllib.request.urlopen(EPISODE_URL.format(episodeID))
+	data = req.read().decode("utf-8")
+
+	# <a target="_blank" href="/open/cale/1190676.html" class="buttonlink" title="daclips.in"
+	for m in EPISODE_LINK_RE.finditer(data):
+		source = m.group(2)
+		linkID = m.group(1)
+		if source in results:
+			results[source].append(linkID)
+		else:
+			results[source] = [linkID]
+
+	return results
+
+def getVideoLink(linkID): # linkID -> 1289651
 	pass
+	

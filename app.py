@@ -52,6 +52,23 @@ def show(showID):
 	
 	return a
 
+@app.route("/episode/<episodeID>")
+def episode(episodeID):
+	# ID should be unique per directory
+	# Requesting an ID should get an aggregate of
+	# all the results from all the different directories
+	# an ID from any directory should be able to refer to the aggregate
+	results = {}
+	a = ""
+
+	for b in directoryList:
+		results[b.id] = b.getEpisode(episodeID)
+
+	for k in results:
+		a += " {} -> {}".format(k, results[k])
+	
+	return a
+
 @app.route("/video", methods = ["GET"])
 def video():
 	videoURL = request.args.get("url")
