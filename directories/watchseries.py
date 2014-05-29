@@ -17,7 +17,7 @@ SEARCH_RE = re.compile(r"\<a href=\"/serie/(.+?)\" title=\"(.+?)\"\>")
 SHOW_RE = re.compile(r"\<a href=\"/episode/(.+?)\.html\"\>") # the_mentalist_s1_e1
 
 EPISODE_LINK_RE = re.compile(r"\<a target=\"_blank\" href=\"/open/cale/(\d+)\.html\" class=\"buttonlink\" title=\"(.+?)\"")
-
+VIDEO_LINK_RE = re.compile(r"\<a href=\"(.+?)\" class=\"myButton\"\>")
 
 def search(query):
 	results = {}
@@ -49,8 +49,17 @@ def getShow(showID): # showID -> how_i_met_your_mother
 
 	return results
 
+def resolveLink(linkID): # linkID -> 1289651
+	req = urllib.request.urlopen(VIDEO_AD_URL.format(linkID))
+	data = req.read().decode("utf-8")
+
+	# <a href="http://daclips.in/ealrjx6zvcnt" class="myButton">
+	match = VIDEO_LINK_RE.search(data)
+	return match.group(1)
+
 def getEpisode(episodeID): # episodeID -> how_i_met_your_mother_s2_e12
 	results = {}
+	hostlinks = []
 
 	req = urllib.request.urlopen(EPISODE_URL.format(episodeID))
 	data = req.read().decode("utf-8")
@@ -58,14 +67,15 @@ def getEpisode(episodeID): # episodeID -> how_i_met_your_mother_s2_e12
 	# <a target="_blank" href="/open/cale/1190676.html" class="buttonlink" title="daclips.in"
 	for m in EPISODE_LINK_RE.finditer(data):
 		source = m.group(2)
-		linkID = m.group(1)
+		linkID = int(m.group(1))
 		if source in results:
 			results[source].append(linkID)
 		else:
 			results[source] = [linkID]
 
-	return results
+		hostlinks.append(resolveLink(linkID))
 
-def getVideoLink(linkID): # linkID -> 1289651
-	pass
+	return (results, hostlinks)
+
+
 	
