@@ -47,6 +47,8 @@ def getShow(showID): # showID -> how_i_met_your_mother
 		else:
 			results[season - 1].append(m.group(1))
 
+	results[0] = results[0][1:]
+
 	return results
 
 def resolveLink(linkID): # linkID -> 1289651
