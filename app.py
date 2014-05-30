@@ -20,7 +20,7 @@ vidHostList = []
 
 @app.route("/")
 def main():
-	return render_template("base.html", searchVal = "")
+	return render_template("main.html", searchVal = "")
 
 @app.route("/search", methods = ["GET"])
 def search():

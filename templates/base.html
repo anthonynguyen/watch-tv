@@ -13,11 +13,12 @@
 	}
 
 	body {
+		background: #eaeaea;
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;
 		box-sizing: border-box;
 		font-family: "Open Sans", sans-serif;
-		font-size: 14pt;
+		font-size: 13pt;
 		height: 100%;
 		width: 100%;
 	}
@@ -39,13 +40,19 @@
 		background: #333;
 		color: #fff;
 		font-family: "Roboto";
-		font-size: 1.2em;
+		font-size: 1.3em;
 		height: 70px;
 		padding: 20px;
 		width: 100%;
 	}
 
+	header a {
+		color: #fff;
+		text-decoration: none;
+	}
+
 	#search-bar {
+		background: #fff;
 		border-bottom: 2px solid #ddd;
 		height: 50px;
 		padding: 10px;
@@ -81,7 +88,23 @@
 	}
 
 	main {
+		padding: 20px 0;
 		width: 100%;
+	}
+
+	.search-result {
+		background: #fff;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		-webkit-box-shadow: 0px 2px 5px 0px #ccc;
+		-moz-box-shadow: 0px 2px 5px 0px #ccc;
+		box-shadow: 0px 2px 5px 0px #ccc;
+		display: inline-block;
+		float: left;
+		height: 200px;
+		margin: 10px;
+		padding: 15px;
+		width: 296px;
 	}
 
 	
@@ -89,7 +112,7 @@
 </head>
 <body>
 	<header class="bb">
-		<div class="constrain">watch-tv</div>
+		<div class="constrain"><a href="/">watch-tv</a></div>
 	</header>
 	<section id="search-bar" class="bb">
 		<div class="constrain">
@@ -100,7 +123,6 @@
 	</section>
 	<main class="constrain">
 		{% block main %}
-		
 		{% endblock %}
 	</main>
 </body>

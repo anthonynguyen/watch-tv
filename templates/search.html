@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - search: {{ query}}{% endblock %}
 {% block main %}
-	{% for source in results %}
-		{% for result in results[source] %}
-			<div class="search-result">{{ results[source][result] }}</div>
+	{% for source, episodes in results.items() %}
+		{% for id, name in episodes.items() %}
+			<a href="/show/{{ id }}"><div class="search-result bb">{{ name }}</div></a>
 		{% endfor %}
 	{% endfor %}
 {% endblock %}
