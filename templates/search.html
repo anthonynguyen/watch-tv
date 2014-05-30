@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - search: {{ query}}{% endblock %}
 {% block main %}
-	{% for source, episodes in results.items() %}
-		{% for id, name in episodes.items() %}
-			<a href="/show/{{ id }}"><div class="search-result bb">{{ name }}</div></a>
+	{% for source, shows in results.items() %}
+		{% for id, name in shows.items()|sort() %}
+			<a href="/show/{{ id }}"><div class="search-result bb" style="background-image: url({{ art[id] }})"><span class="search-caption bb">{{ name }}</span></div></a>
 		{% endfor %}
 	{% endfor %}
 {% endblock %}
