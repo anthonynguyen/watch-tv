@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+	<title>{% block title %}watch-tv{% endblock %}</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<style type="text/css">
+	* {
+		margin: 0;
+		outline: 0;
+		padding: 0;
+	}
+
+	body {
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+		font-family: "Open Sans", sans-serif;
+		font-size: 14pt;
+		height: 100%;
+		width: 100%;
+	}
+
+	.bb {
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	.constrain {
+		left: 50%;
+		margin-left: -480px;
+		width: 960px;
+		position: absolute;
+	}
+
+	header {
+		background: #333;
+		color: #fff;
+		font-family: "Roboto";
+		font-size: 1.2em;
+		height: 70px;
+		padding: 20px;
+		width: 100%;
+	}
+
+	#search-bar {
+		border-bottom: 2px solid #ddd;
+		height: 50px;
+		padding: 10px;
+		text-align: center;
+		width: 100%;
+	}
+
+	input[type=text], input[type=submit] {
+		background: #fff;
+		border: 1px solid #ccc;
+		padding: 5px;
+	}
+
+	input:hover {
+		border: 1px solid #777;
+	}
+
+	input:focus {
+		border: 1px solid #ffbb33;
+	}
+
+	#search-field {
+		border-right: 0;
+		width: 200px;
+	}
+
+	#search-submit {
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABKklEQVQ4y53TzSrFQRzG8c/xXt4WChEprCiJLERWUsrKgg0bbkJWysrOBcjGxkIWZ8ENKBKllCQuAEmivKRj84u/c45DvjXN4jfzzG+eeSbli3L0YxztyOAMOzjBqzykYq7CKurxjGOUogdlOMUynvKJVGANW5jOU59HGkvRZQ7DsWDKz8zFmoHsQhEm8IjNAgLbuA+PcgQ6caQwd7hBR3jzTSCTMPM3Mvk6OEffLxvr0YgLvGULpFGJmR82pzCJahxkF4txjV4Mxf2uEqGpwyzG8ILd8CMnSDVYQDduwzBoQm2EqyJeazEO+exAqO/hMpLXgJKI8EbEeTCuMYhDPBQyrSxGkrYQS0dqW5MdZPMeI8l9nDwa4iPY/+v7J2nBSnzAW/+kGevo+gBEtTuDUjFNHQAAAABJRU5ErkJggg==);
+		background-position: center center;
+		background-repeat: no-repeat;
+		cursor: pointer;
+		width: 36px;
+	}
+
+	main {
+		width: 100%;
+	}
+
+	
+	</style>
+</head>
+<body>
+	<header class="bb">
+		<div class="constrain">watch-tv</div>
+	</header>
+	<section id="search-bar" class="bb">
+		<div class="constrain">
+			<form id="search-form" method="get" action="/search">
+				<input id="search-field" type="text" name="q" value="{{ searchVal }}" placeholder="Search for a TV show"></input><input id="search-submit" type="submit" value="&nbsp;"/>
+			</form>
+		</div>
+	</section>
+	<main class="constrain">
+		{% block main %}
+		
+		{% endblock %}
+	</main>
+</body>
+</html>
+

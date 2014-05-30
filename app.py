@@ -3,8 +3,10 @@ watch-tv - watch some TV pulled from various online sources
 """
 
 from flask import Flask
+from flask import render_template
 from flask import request
 
+import html
 import importlib
 import pkgutil
 import urllib.parse
@@ -17,23 +19,28 @@ directoryList = []
 vidHostList = []
 
 @app.route("/")
-def hello_world():
-	return "Hello World!"
+def main():
+	return render_template("base.html", searchVal = "")
 
-@app.route("/search/<q>")
-def search(q):
+@app.route("/search", methods = ["GET"])
+def search():
 	# Go through all the directories to search for the query
 	# Try to merge results if they are the same
 	# Cache merged results?
+	q = request.args.get("q")
+
 	results = {}
 	a = ""
 
 	for b in directoryList:
 		results[b.id] = b.search(q)
-	for k in results:
-		a += " {} -> {}".format(k, results[k])
 
-	return a
+	for k in results:
+		for r in results[k]:
+			print(results[k][r])
+			results[k][r] = html.unescape(results[k][r])
+
+	return render_template("search.html", searchVal = q, results = results)
 
 @app.route("/show/<showID>")
 def show(showID):
