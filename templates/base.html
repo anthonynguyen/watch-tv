@@ -53,7 +53,7 @@
 
 	#search-bar {
 		background: #fff;
-		border-bottom: 2px solid #ddd;
+		border-bottom: 2px solid #d0d0d0;
 		height: 50px;
 		padding: 10px;
 		text-align: center;
@@ -107,7 +107,52 @@
 		width: 296px;
 	}
 
+	#season-nav {
+		float: left;
+		position: relative;
+		width: 300px;
+		z-index: 10;
+	}
+
+	#season-nav ul {
+		list-style-type: none;
+	}
+
+	#season-nav ul li a {
+		display: block;
+		padding: 15px 30px;
+	}
+
+	#season-nav ul li a.active {
+		background: #fff;
+                border: 1px solid #ccc;
+		border-radius: 5px;
+		border-bottom-right-radius: 0;
+		border-right: 0;
+		border-top-right-radius: 0;
+	}
 	
+	#episode-list {
+		background: #fff;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		border-top-left-radius: 0;
+		display: block;
+		float: left;
+		margin-left: -1px;
+		padding: 20px;
+		position: relative;
+		width: 660px;
+		z-index: -99;
+	}
+
+	div.season {
+		display: none;
+	}
+
+	div.season:first-child {
+		display: block;
+	}
 	</style>
 </head>
 <body>

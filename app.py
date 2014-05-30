@@ -37,7 +37,6 @@ def search():
 
 	for k in results:
 		for r in results[k]:
-			print(results[k][r])
 			results[k][r] = html.unescape(results[k][r])
 
 	return render_template("search.html", searchVal = q, results = results)
@@ -54,10 +53,7 @@ def show(showID):
 	for b in directoryList:
 		results[b.id] = b.getShow(showID)
 
-	for k in results:
-		a += " {} -> {}".format(k, results[k])
-	
-	return a
+	return render_template("show.html", name = showID, results = results)
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
