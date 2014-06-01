@@ -11,6 +11,7 @@ import html
 import importlib
 import json
 import pkgutil
+import re
 import urllib.parse
 import urllib.request
 
@@ -31,10 +32,21 @@ defaultArt = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAMAAABlASxn
 coverArt = {}
 episodeArt = {}
 
+def traktSlugify(name):
+	name = name.replace("_", "-")
+	name = urllib.parse.unquote(name)
+	parts = name.split("-")
+	if re.match("\(\d+\)", parts[-1]) is not None:
+		name = "-".join(parts[:-1])
+	name = name.lower()
+	return name
+
 def getShowArt(showID): # Link to image art
 	if showID in coverArt:
 		return coverArt[showID]
-	traktSlug = showID.replace("_", "-") # Try to naively create a Trakt-recognizable slug from the ID's used by the show directories
+
+	traktSlug = traktSlugify(showID)
+
 	apiURL = "http://api.trakt.tv/show/summary.json/{}/{}".format(TRAKT_API_KEY, traktSlug)
 
 	try:
@@ -67,7 +79,8 @@ def getEpisodeArt(showID, season, episodes):
 	if showID in episodeArt and len(episodeArt[showID]) >= season:
 		return episodeArt[showID][season]
 
-	traktSlug = showID.replace("_", "-")
+	traktSlug = traktSlugify(showID)
+
 	apiURL = "http://api.trakt.tv/show/season.json/{}/{}/{}".format(TRAKT_API_KEY, traktSlug, season)
 
 	try:
@@ -178,4 +191,4 @@ def initVidHosts():
 if __name__ == "__main__":
 	initBackends()
 	initVidHosts()
-	app.run(host="0.0.0.0", port=8080)
+	app.run(host="0.0.0.0", port=8080, debug=False)

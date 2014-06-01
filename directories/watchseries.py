@@ -37,7 +37,6 @@ def getShow(showID): # showID -> how_i_met_your_mother
 	results = []
 
 	req = urllib.request.urlopen(SHOW_URL.format(showID))
-	print(SHOW_URL.format(showID))
 	data = req.read().decode("utf-8")
 
 	SHOWNAME_RE = re.compile(r"{}_s(\d+)_e\d+".format(showID))
