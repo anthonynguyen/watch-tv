@@ -10,7 +10,7 @@ import urllib.request
 id = "movpod"
 domain = "movpod.in"
 
-FNAME_RE = re.compile(r"file: \"(.+?/video.flv)\",")
+FNAME_RE = re.compile(r"file: \"(.+?/video.(?:mp4|flv))\",")
 
 # Send POST to http://movpod.in/videoID
 #    + op -> download1
