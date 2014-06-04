@@ -166,7 +166,7 @@ def video():
 	url = urllib.parse.urlparse(videoURL)
 
 	for b in vidHostList:
-		if url.netloc == b.domain:
+		if url.netloc == b.domain or url.netloc == "www." + b.domain:
 			a = b.getVid(url.path[1:])
 			return a
 
