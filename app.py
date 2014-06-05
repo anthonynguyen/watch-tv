@@ -30,14 +30,21 @@ vidHostList = []
 defaultArt = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAMAAABlASxnAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAASUExURczMzFVVVf7+/qmpqX19feXl5WEFUTsAAAKCSURBVHja7dztTuMwEAVQJ2O//ytvSRGULWQnacJKmXN+IRUqceU7jfPR1gAAAAAAAAAAAAAAAAAAgNr6Sb97SZFPoMewtNKxjqGIyd+bmqxaRLKEs6ySS0sJN8z4qVlY2SIqYb6ISrihiF0JH1u2/nKXVbaISrihiKZ7fmmFEqbTUsINB1tKmF9aSrhhxjvZkD/YUsJ8EU33DUVUwnwRlTBfRCXcUEQlzC8tJcynpYQbdj1dCdNLSwk3zHglTBWxvwl3Nvx7XU2feggkl5S81kf79J0umHRWN6LJZyWt53n1c1aa+GTMPyt5EBErXdvrqp+XMZ2i3Ax/aW1dMqzpJLOwhCUsYf1SWL2/n5D51vJa9bD629HR+DgOHSvur68eo107rLjns+kA/+Yjrv4ec1QIa+f+JZ7+vkBYu++4euzdchmoQFi7z64/hHWrZJQIa/f1wP4Z1j3zAmGNA8Lqy9sUCGv3PxePbzDmJqxkWFHj07AfEVaVAX9IWFUGfB+vvsN9ZbUKYcURYVUZ8MeEVWTAx0E1DGElw5qKhNUM+F8O623ACysfVlPDzE56/vqOwhKWsP7LzIrlApGwMitr+SGElVlZ8b4jF1Y6rGm23cmvLGGlBvwys5qwkp+GEWN21iG53VnulRBWcm9Y46B0/zn4EJaw1sI66Lphd0U6F9ZUZbsz7a5h/+sIfggrH9Zc4f6sl8NqZbY7R9z5F8unaoUa9gNuk7yZK2x3dg+t+BJWje3Oci35lZH18dBc1Hgc5eERlLYWXbTP51I8u+NBJ2EJS1jCuoCznr6/ZFgnfa/DuOjX3Z3xjSHjsl8NOJ+gAQAAAAAAAAAAAAAAAAAA8J0/uz0RyXTAZWUAAAAASUVORK5CYII="
 
 coverArt = {}
-episodeArt = {}
+episodeInfo = {}
+
+class episodeMeta():
+	def __init__(self, title):
+		self.title = title
 
 def traktSlugify(name):
 	name = name.replace("_", "-")
 	name = urllib.parse.unquote(name)
 	parts = name.split("-")
+
+	# Remove year from end of ID
 	if re.match("\(\d+\)", parts[-1]) is not None:
 		name = "-".join(parts[:-1])
+
 	name = name.lower()
 	return name
 
@@ -75,26 +82,6 @@ def getShowArt(showID): # Link to image art
 
 		return artURL
 
-def getEpisodeArt(showID, season, episodes):
-	if showID in episodeArt and len(episodeArt[showID]) >= season:
-		return episodeArt[showID][season]
-
-	traktSlug = traktSlugify(showID)
-
-	apiURL = "http://api.trakt.tv/show/season.json/{}/{}/{}".format(TRAKT_API_KEY, traktSlug, season)
-
-	try:
-		req = urllib.request.urlopen(apiURL)
-		data = req.read().decode("utf-8")
-	except:
-		print("except")
-		return [defaultArt] * episodes
-
-	pyData = json.loads(data)
-
-	return [x["screen"] for x in pyData]
-
-
 @app.route("/")
 def main():
 	return render_template("main.html", searchVal = "")
@@ -119,33 +106,77 @@ def search():
 
 	return render_template("search.html", searchVal = q, results = results, art = coverArt)
 
+def populateShowInfo(showID):
+	if showID in episodeInfo:
+		return
+
+	traktSlug = traktSlugify(showID)
+	showInfoURL = "http://api.trakt.tv/show/seasons.json/{}/{}".format(TRAKT_API_KEY, traktSlug)
+
+	seasons = []
+	try:
+		req = urllib.request.urlopen(showInfoURL)
+		data = req.read().decode("utf-8")
+	except:
+		print("except")
+		return
+
+	pyData = json.loads(data)
+	for s in pyData:
+		seasons.append(s["episodes"])
+
+	print("Got show info for " + showID)
+
+	seasonInfo = []
+
+	for s, es in enumerate(seasons):
+		seasonInfoURL = "http://api.trakt.tv/show/season.json/{}/{}/{}".format(TRAKT_API_KEY, traktSlug, s + 1)
+
+		try:
+			req = urllib.request.urlopen(seasonInfoURL)
+			data = req.read().decode("utf-8")
+		except:
+			print("except")
+			result = [None] * es
+			seasonInfo.append(result)
+			continue
+
+		pyData = json.loads(data)
+
+		result = []
+
+		for x in pyData:
+			e = episodeMeta(x["title"])
+			e.art = x["screen"]
+			e.description = x["overview"]
+			e.date = x["first_aired_utc"]
+			result.append(e)
+
+		seasonInfo.append(result)
+
+	episodeInfo[showID] = seasonInfo
+
+
 @app.route("/show/<showID>")
 def show(showID):
-	# ID should be unique per directory
-	# Requesting an ID should get an aggregate of
-	# all the results from all the different directories
-	# an ID from any directory should be able to refer to the aggregate
 	results = {}
 	a = ""
 
 	for b in directoryList:
 		results[b.id] = b.getShow(showID)
 
-	if showID not in episodeArt:
-		episodeArt[showID] = []
-		for k in results:
-			for n, season in enumerate(results[k]):
-				episodeArt[showID].append(getEpisodeArt(showID, n + 1, len(season)))
-				print("Getting art for season {}, length {}".format(n + 1, len(season)))
+	populateShowInfo(showID)
 
-	return render_template("show.html", name = showID, results = results, art = episodeArt[showID])
+	return render_template("show.html", name = showID, results = results, art = [[e.art for e in s] for s in episodeInfo[showID]])
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
-	# ID should be unique per directory
-	# Requesting an ID should get an aggregate of
-	# all the results from all the different directories
-	# an ID from any directory should be able to refer to the aggregate
+	# Get season number and episode number from episodeID
+	parts = episodeID.split("_")
+	showID = "_".join(parts[:-2])
+	season = int(parts[-2][1:]) # parts[-2] -> s10
+	episodeNum = int(parts[-1][1:]) # parts[-1] -> e23
+
 	results = {}
 	a = ""
 
@@ -154,8 +185,10 @@ def episode(episodeID):
 
 	for k in results:
 		a += " {} -> {}".format(k, results[k])
+
+	populateShowInfo(showID)
 	
-	return a
+	return render_template("episode.html", name = showID, season = season, episodeNum = episodeNum, links = results, info = episodeInfo[showID][season - 1][episodeNum - 1])
 
 @app.route("/video", methods = ["GET"])
 def video():
@@ -191,4 +224,4 @@ def initVidHosts():
 if __name__ == "__main__":
 	initBackends()
 	initVidHosts()
-	app.run(host="0.0.0.0", port=8080, debug=False)
+	app.run(host="0.0.0.0", port=8080, debug=True)

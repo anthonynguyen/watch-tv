@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}watch-tv - {{ name }} Season {{ season }} Episode {{ episodeNum }}{% endblock %}
+{% block main -%}
+	{{ info.title }}{{ info.description }}
+	{{ links }}
+{%- endblock %}
