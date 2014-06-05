@@ -3,7 +3,7 @@
 {% block main %}
 	{% for source, shows in results.items() %}
 		{% for id, name in shows.items()|sort() %}
-			<a href="/show/{{ id }}"><div class="search-result bb" style="background-image: url({{ art[id] }})"><span class="search-caption bb">{{ name }}</span></div></a>
+			<a href="/show/{{ id }}"><div class="search-result bb" style="background-image: url({{ info[id].art }})"><span class="search-caption bb">{{ name }}</span></div></a>
 		{% endfor %}
 	{% endfor %}
 {% endblock %}

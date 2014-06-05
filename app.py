@@ -29,8 +29,12 @@ vidHostList = []
 
 defaultArt = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAMAAABlASxnAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAASUExURczMzFVVVf7+/qmpqX19feXl5WEFUTsAAAKCSURBVHja7dztTuMwEAVQJ2O//ytvSRGULWQnacJKmXN+IRUqceU7jfPR1gAAAAAAAAAAAAAAAAAAgNr6Sb97SZFPoMewtNKxjqGIyd+bmqxaRLKEs6ySS0sJN8z4qVlY2SIqYb6ISrihiF0JH1u2/nKXVbaISrihiKZ7fmmFEqbTUsINB1tKmF9aSrhhxjvZkD/YUsJ8EU33DUVUwnwRlTBfRCXcUEQlzC8tJcynpYQbdj1dCdNLSwk3zHglTBWxvwl3Nvx7XU2feggkl5S81kf79J0umHRWN6LJZyWt53n1c1aa+GTMPyt5EBErXdvrqp+XMZ2i3Ax/aW1dMqzpJLOwhCUsYf1SWL2/n5D51vJa9bD629HR+DgOHSvur68eo107rLjns+kA/+Yjrv4ec1QIa+f+JZ7+vkBYu++4euzdchmoQFi7z64/hHWrZJQIa/f1wP4Z1j3zAmGNA8Lqy9sUCGv3PxePbzDmJqxkWFHj07AfEVaVAX9IWFUGfB+vvsN9ZbUKYcURYVUZ8MeEVWTAx0E1DGElw5qKhNUM+F8O623ACysfVlPDzE56/vqOwhKWsP7LzIrlApGwMitr+SGElVlZ8b4jF1Y6rGm23cmvLGGlBvwys5qwkp+GEWN21iG53VnulRBWcm9Y46B0/zn4EJaw1sI66Lphd0U6F9ZUZbsz7a5h/+sIfggrH9Zc4f6sl8NqZbY7R9z5F8unaoUa9gNuk7yZK2x3dg+t+BJWje3Oci35lZH18dBc1Hgc5eERlLYWXbTP51I8u+NBJ2EJS1jCuoCznr6/ZFgnfa/DuOjX3Z3xjSHjsl8NOJ+gAQAAAAAAAAAAAAAAAAAA8J0/uz0RyXTAZWUAAAAASUVORK5CYII="
 
-coverArt = {}
+showInfo = {}
 episodeInfo = {}
+
+class showMeta():
+	def __init__(self, title):
+		self.title = title
 
 class episodeMeta():
 	def __init__(self, title):
@@ -48,9 +52,9 @@ def traktSlugify(name):
 	name = name.lower()
 	return name
 
-def getShowArt(showID): # Link to image art
-	if showID in coverArt:
-		return coverArt[showID]
+def populateShowInfo(showID):
+	if showID in showInfo and showInfo[showID] is not None:
+		return
 
 	traktSlug = traktSlugify(showID)
 
@@ -64,9 +68,12 @@ def getShowArt(showID): # Link to image art
 
 	pyData = json.loads(data)
 	if pyData["status"] ==  "failure":
-		return defaultArt
-
+		showInfo[showID] = None
+		return
 	else:
+		info = showMeta(pyData["title"])
+		info.description = pyData["overview"]
+
 		if "images" in pyData and "fanart" in pyData["images"]:
 			artURL = pyData["images"]["fanart"]
 			size = "-940"
@@ -75,15 +82,18 @@ def getShowArt(showID): # Link to image art
 			size = "-300"
 
 		if "poster-dark" in artURL or "fanart-dark" in artURL:
-			return defaultArt
+			info.art = defaultArt
+
 		artURL = artURL.split(".")
 		artURL[-2] += size
 		artURL = ".".join(artURL)
 
-		return artURL
+		info.art = artURL
+
+	showInfo[showID] = info
 
 
-def populateShowInfo(showID):
+def populateEpisodeInfo(showID):
 	if showID in episodeInfo:
 		return
 
@@ -154,9 +164,9 @@ def search():
 	for k in results:
 		for r in results[k]:
 			results[k][r] = html.unescape(results[k][r])
-			coverArt[r] = getShowArt(r)
+			populateShowInfo(r)
 
-	return render_template("search.html", searchVal = q, results = results, art = coverArt)
+	return render_template("search.html", searchVal = q, results = results, info = showInfo)
 
 @app.route("/show/<showID>")
 def show(showID):
@@ -166,8 +176,9 @@ def show(showID):
 		results[b.id] = b.getShow(showID)
 
 	populateShowInfo(showID)
+	populateEpisodeInfo(showID)
 
-	return render_template("show.html", name = showID, results = results, art = [[e.art for e in s] for s in episodeInfo[showID]])
+	return render_template("show.html", name = showID, results = results, info = showInfo[showID], art = [[e.art for e in s] for s in episodeInfo[showID]])
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
@@ -182,7 +193,7 @@ def episode(episodeID):
 	for b in directoryList:
 		results[b.id] = b.getEpisode(episodeID)
 
-	populateShowInfo(showID)
+	populateEpisodeInfo(showID)
 	
 	return render_template("episode.html", name = showID, season = season, episodeNum = episodeNum, links = results, info = episodeInfo[showID][season - 1][episodeNum - 1])
 
