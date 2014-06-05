@@ -82,29 +82,6 @@ def getShowArt(showID): # Link to image art
 
 		return artURL
 
-@app.route("/")
-def main():
-	return render_template("main.html", searchVal = "")
-
-@app.route("/search", methods = ["GET"])
-def search():
-	# Go through all the directories to search for the query
-	# Try to merge results if they are the same
-	# Cache merged results?
-	q = request.args.get("q")
-
-	results = {}
-	a = ""
-
-	for b in directoryList:
-		results[b.id] = b.search(q)
-
-	for k in results:
-		for r in results[k]:
-			results[k][r] = html.unescape(results[k][r])
-			coverArt[r] = getShowArt(r)
-
-	return render_template("search.html", searchVal = q, results = results, art = coverArt)
 
 def populateShowInfo(showID):
 	if showID in episodeInfo:
@@ -157,10 +134,33 @@ def populateShowInfo(showID):
 	episodeInfo[showID] = seasonInfo
 
 
+@app.route("/")
+def main():
+	return render_template("main.html", searchVal = "")
+
+@app.route("/search", methods = ["GET"])
+def search():
+	# Go through all the directories to search for the query
+	# Try to merge results if they are the same
+	# Cache merged results?
+	q = request.args.get("q")
+
+	results = {}
+	a = ""
+
+	for b in directoryList:
+		results[b.id] = b.search(q)
+
+	for k in results:
+		for r in results[k]:
+			results[k][r] = html.unescape(results[k][r])
+			coverArt[r] = getShowArt(r)
+
+	return render_template("search.html", searchVal = q, results = results, art = coverArt)
+
 @app.route("/show/<showID>")
 def show(showID):
 	results = {}
-	a = ""
 
 	for b in directoryList:
 		results[b.id] = b.getShow(showID)
@@ -178,13 +178,9 @@ def episode(episodeID):
 	episodeNum = int(parts[-1][1:]) # parts[-1] -> e23
 
 	results = {}
-	a = ""
 
 	for b in directoryList:
 		results[b.id] = b.getEpisode(episodeID)
-
-	for k in results:
-		a += " {} -> {}".format(k, results[k])
 
 	populateShowInfo(showID)
 	
