@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - show: {{ name }}{% endblock %}
 {% block main -%}
-
+	<h1>{{ info.title }}</h1>
+	<div id="show-art"><img src="{{ info.poster }}" width="300" height="450"></img></div>
+	<div id="show-info" class="bb">
+		<p>{{ info.description }}</p>
+		<p>First aired {{ info.firstAir }}</p>
+		<p id="show-genres">{{ info.genres }}
+	</div>
 	{% for source, seasons in results.items() -%}
 		{% for season in seasons -%}
 			{% set seasonLoop = loop %}
-			<h1>Season {{ loop.index }}</h1>
+			<h2>Season {{ loop.index }}</h3>
 			{% for episode in season %}
 				<a href="/episode/{{ episode }}"><div class="search-result bb" style="background-image: url({{ art[seasonLoop.index0][loop.index0] }})"><span class="search-caption bb">Season {{ seasonLoop.index}} Episode {{ loop.index }}</span></div></a>
 			{% endfor %}

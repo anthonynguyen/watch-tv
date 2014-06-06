@@ -7,6 +7,7 @@ from flask import Flask
 from flask import render_template
 from flask import request
 
+import datetime
 import html
 import importlib
 import json
@@ -81,14 +82,29 @@ def populateShowInfo(showID):
 			artURL = pyData["poster"]
 			size = "-300"
 
+		posterURL = pyData["poster"]
+
 		if "poster-dark" in artURL or "fanart-dark" in artURL:
 			info.art = defaultArt
+
+		if "poster-dark" in posterURL or "fanart-dark" in posterURL:
+			info.poster = defaultArt
 
 		artURL = artURL.split(".")
 		artURL[-2] += size
 		artURL = ".".join(artURL)
 
+		posterURL = posterURL.split(".")
+		posterURL[-2] += "-300"
+		posterURL = ".".join(posterURL)
+
 		info.art = artURL
+		info.poster = posterURL
+
+		info.firstAir = datetime.date.fromtimestamp(pyData["first_aired_utc"]).strftime("%B %d, %Y")
+		info.genres = ", ".join(pyData["genres"])
+
+		info.cast = pyData["people"]["actors"]
 
 	showInfo[showID] = info
 

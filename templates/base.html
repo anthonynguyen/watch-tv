@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 	<title>{% block title %}watch-tv{% endblock %}</title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -17,7 +17,8 @@
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;
 		box-sizing: border-box;
-		font-family: "Open Sans", sans-serif;
+		color: #444;
+		font-family: "Lato", sans-serif;
 		font-size: 13pt;
 		height: 100%;
 		width: 100%;
@@ -46,7 +47,6 @@
 		background: linear-gradient(to bottom, #e5e5e5 0%,#ffffff 100%);
 		color: #777;
 		font-family: "Roboto";
-		font-size: 1.3em;
 		height: 90px;
 		padding: 30px;
 		width: 100%;
@@ -54,13 +54,19 @@
 
 	header a {
 		color: inherit;
+		font-size: 1.7em;
 		text-decoration: none;
+	}
+
+	header p {
+		color: #888;
+		font-size: 0.7em;
 	}
 
 	#search-bar {
 		background: #fff;
 		border-bottom: 2px solid #d0d0d0;
-		height: 50px;
+		height: 60px;
 		padding: 10px;
 		text-align: center;
 		width: 100%;
@@ -177,11 +183,47 @@
 	div.season:first-child {
 		display: block;
 	}
+
+	main h1 {
+		border-bottom: 2px solid #888;
+		margin-bottom: 20px;
+		padding-bottom: 10px;
+		text-align: right;
+	}
+
+	main h2 {
+		border-bottom: 2px solid #ccc;
+		clear: both;
+		display: block;
+		margin-bottom: 20px;
+		padding-top: 40px;
+	}
+
+	#show-art {
+		float: left;
+		height: 450px;
+		width: 300px;
+	}
+
+	#show-info {
+		float: right;
+		width: 600px;
+	}
+
+	#show-info p {
+		margin-bottom: 1em;
+	}
+
+	#show-genres {
+		color: #999;
+		font-style: italic;
+		text-transform: lowercase;
+	}
 	</style>
 </head>
 <body>
 	<header class="bb">
-		<div class="constrain"><a href="/">watch-tv</a></div>
+		<div class="constrain"><a href="/">watch-tv</a><p>watch TV shows culled from various online sources</p></div>
 	</header>
 	<section id="search-bar" class="bb">
 		<div class="constrain">
