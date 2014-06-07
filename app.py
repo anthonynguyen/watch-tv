@@ -56,6 +56,22 @@ def traktSlugify(name):
 	name = name.lower()
 	return name
 
+def nameFromSlug(slug):
+	contractions = {
+		"Don t ": "Don't ",
+		"Can t ": "Can't ",
+		"Won t ": "Won't ",
+		"Isn t ": "Isn't ",
+		"I m ": "I'm",
+		"He s ": "He's ",
+		"She s ": "She's "
+	}
+	name = slug.replace("_", " ")
+	for contraction in contractions:
+		name = name.replace(contraction, contractions[contraction])
+
+	return name
+
 def populateShowInfo(showID):
 	if showID in showInfo and showInfo[showID] is not None:
 		return
@@ -201,7 +217,7 @@ def show(showID):
 		art = defaultArt
 	else:
 		art = [[e.art for e in s] for s in episodeInfo[showID]]
-	return render_template("show.html", name = showID, results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art)
+	return render_template("show.html", name = nameFromSlug(showID), results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art)
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
@@ -223,7 +239,7 @@ def episode(episodeID):
 	else:
 		info = episodeInfo[showID][season - 1][episodeNum - 1]
 	
-	return render_template("episode.html", name = showID, season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
+	return render_template("episode.html", name = nameFromSlug(showID), season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
 
 @app.route("/video", methods = ["GET"])
 def video():
