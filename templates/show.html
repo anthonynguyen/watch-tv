@@ -17,7 +17,7 @@
 			{% set seasonLoop = loop %}
 			<h2>Season {{ loop.index }}</h3>
 			{% for episode in season %}
-				<a href="/episode/{{ episode }}"><div class="search-result bb" style="background-image: url({% if hasInfo %}{{ art[seasonLoop.index0][loop.index0] }}{% else %}{{ art }}{% endif %})"><span class="search-caption bb">Season {{ seasonLoop.index}} Episode {{ loop.index }}</span></div></a>
+				<a href="/episode/{{ episode }}"><div class="search-result bb" style="background-image: url({% if hasInfo %}{{ art[seasonLoop.index0][loop.index0] }}{% else %}{{ art }}{% endif %})"><span class="search-caption bb">Season {{ seasonLoop.index}} Episode {{ loop.index }}{% if hasInfo %}: {{titles[seasonLoop.index0][loop.index0] }}{% endif %} </span></div></a>
 			{% endfor %}
 		{%- endfor %}
 	{%- endfor %}

@@ -210,14 +210,21 @@ def show(showID):
 	for b in directoryList:
 		results[b.id] = b.getShow(showID)
 
+		# Remove first episode if it is episode 0
+		for season in results[b.id]:
+			if season[0][-1] == "0":
+				season.pop(0)
+
 	populateShowInfo(showID)
 	populateEpisodeInfo(showID)
 
 	if episodeInfo[showID] is None:
 		art = defaultArt
+		titles = []
 	else:
 		art = [[e.art for e in s] for s in episodeInfo[showID]]
-	return render_template("show.html", name = nameFromSlug(showID), results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art)
+		titles = [[e.title for e in s] for s in episodeInfo[showID]]
+	return render_template("show.html", name = nameFromSlug(showID), results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art, titles = titles)
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
