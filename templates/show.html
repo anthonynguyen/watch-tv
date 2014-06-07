@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - show: {{ name }}{% endblock %}
 {% block main -%}
-	<h1>{{ info.title }}</h1>
+	<h1>{% if hasInfo %}{{ info.title }}{% else %}{{ name }}{% endif %}</h1>
 	<div id="show-art"><img src="{{ info.poster }}" width="300" height="450"></img></div>
 	<div id="show-info" class="bb">
+		{% if hasInfo %}
 		<p>{{ info.description }}</p>
 		<p>First aired {{ info.firstAir }}</p>
 		<p id="show-genres">{{ info.genres }}
+		{% else %}
+		No information available
+		{% endif %}
 	</div>
 	{% for source, seasons in results.items() -%}
 		{% for season in seasons -%}
