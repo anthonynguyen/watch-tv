@@ -34,12 +34,14 @@ showInfo = {}
 episodeInfo = {}
 
 class showMeta():
-	def __init__(self, title):
-		self.title = title
+	def __init__(self, hasInfo):
+		self.hasInfo = hasInfo
 
 class episodeMeta():
-	def __init__(self, title):
-		self.title = title
+	def __init__(self, hasInfo):
+		self.hasInfo = hasInfo
+		if not hasInfo:
+			self.art = defaultArt
 
 def traktSlugify(name):
 	name = name.replace("_", "-")
@@ -65,14 +67,22 @@ def populateShowInfo(showID):
 		req = urllib.request.urlopen(apiURL)
 		data = req.read().decode("utf-8")
 	except:
-		return defaultArt
+		info = showMeta(False)
+		info.art = defaultArt
+		info.poster = defaultArt # Change this to default poster
+		showInfo[showID] = info
+		return
 
 	pyData = json.loads(data)
 	if pyData["status"] ==  "failure":
-		showInfo[showID] = None
+		info = showMeta(False)
+		info.art = defaultArt
+		info.poster = defaultArt # Change this to default poster
+		showInfo[showID] = info
 		return
 	else:
-		info = showMeta(pyData["title"])
+		info = showMeta(True)
+		info.title = pyData["title"]
 		info.description = pyData["overview"]
 
 		if "images" in pyData and "fanart" in pyData["images"]:
@@ -121,7 +131,7 @@ def populateEpisodeInfo(showID):
 		req = urllib.request.urlopen(showInfoURL)
 		data = req.read().decode("utf-8")
 	except:
-		print("except")
+		episodeInfo[showID] = None
 		return
 
 	pyData = json.loads(data)
@@ -139,8 +149,7 @@ def populateEpisodeInfo(showID):
 			req = urllib.request.urlopen(seasonInfoURL)
 			data = req.read().decode("utf-8")
 		except:
-			print("except")
-			result = [None] * es
+			result = [episodeMeta(False)] * es
 			seasonInfo.append(result)
 			continue
 
@@ -149,7 +158,8 @@ def populateEpisodeInfo(showID):
 		result = []
 
 		for x in pyData:
-			e = episodeMeta(x["title"])
+			e = episodeMeta(True)
+			e.title = x["title"]
 			e.art = x["screen"]
 			e.description = x["overview"]
 			e.date = x["first_aired_utc"]
@@ -172,7 +182,6 @@ def search():
 	q = request.args.get("q")
 
 	results = {}
-	a = ""
 
 	for b in directoryList:
 		results[b.id] = b.search(q)
@@ -194,7 +203,11 @@ def show(showID):
 	populateShowInfo(showID)
 	populateEpisodeInfo(showID)
 
-	return render_template("show.html", name = showID, results = results, info = showInfo[showID], art = [[e.art for e in s] for s in episodeInfo[showID]])
+	if episodeInfo[showID] is None:
+		art = defaultArt
+	else:
+		art = [[e.art for e in s] for s in episodeInfo[showID]]
+	return render_template("show.html", name = showID, results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art)
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
@@ -210,8 +223,13 @@ def episode(episodeID):
 		results[b.id] = b.getEpisode(episodeID)
 
 	populateEpisodeInfo(showID)
+
+	if episodeInfo[showID] is None:
+		info = None
+	else:
+		info = episodeInfo[showID][season - 1][episodeNum - 1]
 	
-	return render_template("episode.html", name = showID, season = season, episodeNum = episodeNum, links = results, info = episodeInfo[showID][season - 1][episodeNum - 1])
+	return render_template("episode.html", name = showID, season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
 
 @app.route("/video", methods = ["GET"])
 def video():

@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - {{ name }} Season {{ season }} Episode {{ episodeNum }}{% endblock %}
 {% block main -%}
-	{{ info.title }}{{ info.description }}
+	{% if hasInfo %}
+		{{ info.title }}{{ info.description }}
+	{% else %}
+		{{ name }}
+	{% endif %}
 	{{ links }}
 {%- endblock %}
