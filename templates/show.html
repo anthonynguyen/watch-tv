@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}watch-tv - show: {{ name }}{% endblock %}
+{% block title %}watch-tv - {{ name }}{% endblock %}
 {% block main -%}
 	<h1>{% if hasInfo %}{{ info.title }}{% else %}{{ name }}{% endif %}</h1>
 	<div id="show-art"><img src="{{ info.poster }}" width="300" height="450"></img></div>
