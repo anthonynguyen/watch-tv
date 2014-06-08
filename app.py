@@ -274,9 +274,23 @@ def episode(episodeID):
 	
 	return render_template("episode.html", name = showTitle, season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
 
+@app.route("/resolve", methods = ["GET"])
+def resolve():
+	videoID = request.args.get("id")
+
+	for b in directoryList:
+		if videoID[:len(b.id)] == b.id:
+			return video(b.resolveLink(videoID[len(b.id):]))
+
+	pass
+
 @app.route("/video", methods = ["GET"])
-def video():
-	videoURL = request.args.get("url")
+def video(vidURL = None):
+	if vidURL is None:
+		videoURL = request.args.get("url")
+	else:
+		videoURL = vidURL
+
 	if "//" not in videoURL:
 		videoURL = "//" + videoURL
 

@@ -1,10 +1,26 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - {{ name }} Season {{ season }} Episode {{ episodeNum }}{% endblock %}
 {% block main -%}
-	{% if hasInfo %}
-		{{ info.title }}{{ info.description }}
-	{% else %}
-		{{ name }}
-	{% endif %}
-	{{ links }}
+	<h1>{{ name }}: Season {{ season }} Episode {{ episodeNum }}</h1>
+	<div id="episode-art"><img src="{{ info.art }}" width="300" height="200"></img></div>
+	<div id="show-info" class="bb">
+		{% if hasInfo %}
+		<p>{{ info.description }}</p>
+		<p>First aired {{ info.firstAir }}.</p>
+		{% else %}
+		No information available
+		{% endif %}
+	</div>
+	<div id="episode-links" class="bb">
+	{% for source, list in links.items() %}
+		{% for provider, ids in list.items() %}
+			<h2>{{ provider }}</h2>
+			<ul>
+			{% for id in ids %}
+			<li><a href="/resolve?id={{source}}{{ id }}">{{ id }}</a></li>
+			{% endfor %}
+			</ul>
+		{% endfor %}
+	{% endfor %}
+	</div>
 {%- endblock %}
