@@ -308,9 +308,9 @@ def video(vidURL = None):
 	for b in vidHostList:
 		if url.netloc == b.domain or url.netloc == "www." + b.domain:
 			a = b.getVid(url.path[1:])
-			return a
+			return render_template("video.html", url = a)
 
-	return "Video not found"
+	return render_template("video.html", url = "Video not found")
 
 def initBackends():
 	for importer, mod, ispkg in pkgutil.iter_modules(directories.__path__):
