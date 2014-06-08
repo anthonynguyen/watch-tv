@@ -250,6 +250,15 @@ def episode(episodeID):
 	for b in directoryList:
 		results[b.id] = b.getEpisode(episodeID)
 
+		toRem = []
+		for r in results[b.id]:
+			if r not in [x.domain for x in vidHostList]:
+				toRem.append(r)
+
+		for h in toRem:
+			del results[b.id][h]
+
+
 	foundResult = False
 	for r in results:
 		if results[r] is not None:
