@@ -36,8 +36,11 @@ def getShow(showID): # showID -> how_i_met_your_mother
 	showID = urllib.parse.quote(showID)
 	results = []
 
-	req = urllib.request.urlopen(SHOW_URL.format(showID))
-	data = req.read().decode("utf-8")
+	try:
+		req = urllib.request.urlopen(SHOW_URL.format(showID))
+		data = req.read().decode("utf-8")
+	except:
+		return None
 
 	SHOWNAME_RE = re.compile(r"{}_s(\d+)_e\d+".format(showID))
 
@@ -66,8 +69,11 @@ def getEpisode(episodeID): # episodeID -> how_i_met_your_mother_s2_e12
 	results = {}
 	hostlinks = []
 
-	req = urllib.request.urlopen(EPISODE_URL.format(episodeID))
-	data = req.read().decode("utf-8")
+	try:
+		req = urllib.request.urlopen(EPISODE_URL.format(episodeID))
+		data = req.read().decode("utf-8")
+	except:
+		return None
 
 	# <a target="_blank" href="/open/cale/1190676.html" class="buttonlink" title="daclips.in"
 	for m in EPISODE_LINK_RE.finditer(data):

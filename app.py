@@ -148,8 +148,6 @@ def populateEpisodeInfo(showID):
 	for s in pyData:
 		seasons.append(s["episodes"])
 
-	print("Got show info for " + showID)
-
 	seasonInfo = []
 
 	for s, es in enumerate(seasons):
@@ -172,7 +170,7 @@ def populateEpisodeInfo(showID):
 			e.title = x["title"]
 			e.art = x["screen"]
 			e.description = x["overview"]
-			e.date = x["first_aired_utc"]
+			e.firstAir = datetime.date.fromtimestamp(x["first_aired_utc"]).strftime("%B %d, %Y")
 			result.append(e)
 
 		seasonInfo.append(result)
@@ -210,10 +208,17 @@ def show(showID):
 	for b in directoryList:
 		results[b.id] = b.getShow(showID)
 
-		# Remove first episode if it is episode 0
-		for season in results[b.id]:
-			if season[0][-1] == "0":
-				season.pop(0)
+	foundResult = False
+	for r in results:
+		if results[r] is not None:
+			for season in results[b.id]:
+				if season[0][-1] == "0":
+					season.pop(0)
+			foundResult = True
+			break
+
+	if not foundResult:
+		return render_template("show_notfound.html", name = showID)
 
 	populateShowInfo(showID)
 	populateEpisodeInfo(showID)
@@ -224,7 +229,13 @@ def show(showID):
 	else:
 		art = [[e.art for e in s] for s in episodeInfo[showID]]
 		titles = [[e.title for e in s] for s in episodeInfo[showID]]
-	return render_template("show.html", name = nameFromSlug(showID), results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art, titles = titles)
+
+	if showInfo[showID].hasInfo:
+		showTitle = showInfo[showID]
+	else:
+		showTitle = nameFromSlug(showID)
+	
+	return render_template("show.html", name = showTitle, results = results, hasInfo = (not episodeInfo[showID] is None), info = showInfo[showID], art = art, titles = titles)
 
 @app.route("/episode/<episodeID>")
 def episode(episodeID):
@@ -239,14 +250,29 @@ def episode(episodeID):
 	for b in directoryList:
 		results[b.id] = b.getEpisode(episodeID)
 
+	foundResult = False
+	for r in results:
+		if results[r] is not None:
+			foundResult = True
+			break
+
+	if not foundResult:
+		return render_template("episode_notfound.html", name = episodeID)
+
+	populateShowInfo(showID)
 	populateEpisodeInfo(showID)
 
 	if episodeInfo[showID] is None:
 		info = None
 	else:
 		info = episodeInfo[showID][season - 1][episodeNum - 1]
+
+	if showInfo[showID].hasInfo:
+		showTitle = showInfo[showID].title
+	else:
+		showTitle = nameFromSlug(showID)
 	
-	return render_template("episode.html", name = nameFromSlug(showID), season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
+	return render_template("episode.html", name = showTitle, season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
 
 @app.route("/video", methods = ["GET"])
 def video():
