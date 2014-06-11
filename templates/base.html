@@ -4,7 +4,9 @@
 	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 	<title>{% block title %}watch-tv{% endblock %}</title>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	{% block head %}
+
+	{% endblock %}
 	<style type="text/css">
 	* {
 		margin: 0;
@@ -226,6 +228,30 @@
 
 	#episode-links {
 		clear: both;
+	}
+
+	#shadow {
+		background-color: rgba(0,0,0,0.8);
+		display: none;
+		height: 100%;
+		left: 0;
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 5;
+	}
+
+	#vidBox {
+		background: #fff;
+		display: none;
+		position: fixed;
+		height: 480px;
+		left: 50%;
+		margin-left: -427px;
+		margin-top: -240px;
+		top: 50%;
+		width: 854px;
+		z-index: 6;
 	}
 	</style>
 </head>

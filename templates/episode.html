@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% block title %}watch-tv - {{ name }} Season {{ season }} Episode {{ episodeNum }}{% endblock %}
+
+{% block head %}
+<link href="//vjs.zencdn.net/4.6/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.6/video.js"></script>
+{% endblock %}
+
 {% block main -%}
 	<h1>{{ name }}: Season {{ season }} Episode {{ episodeNum }}</h1>
 	<div id="episode-art"><img src="{{ info.art }}" width="300" height="200"></img></div>
@@ -17,10 +23,49 @@
 			<h2>{{ provider }}{% if provider in html5VidHosts %} - html5{% else %} - flash{% endif %}</h2>
 			<ul>
 			{% for id in ids %}
-			<li><a href="/resolve?id={{source}}{{ id }}">{{ id }}</a></li>
+			<li><a class="vidLink" href="/resolve?id={{source}}{{ id }}">{{ id }}</a></li>
 			{% endfor %}
 			</ul>
 		{% endfor %}
 	{% endfor %}
 	</div>
+	<div id="shadow"></div>
+	<div id="vidBox" class="bb"><video id="vidVid" class="video-js vjs-default-skin" controls width="100%" height="100%" poster="http://video-js.zencoder.com/oceans-clip.png">
+ <source id="videoLink" src="" type="" />
+ <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+</video></div>
+
+	<script type="text/javascript">
+	var vidLinks = document.getElementsByClassName("vidLink");
+	var i;
+	for (i = 0; i < vidLinks.length; i++) {
+		vidLinks[i].onclick = function(e) {
+			e.preventDefault();
+			var url = this.href;
+			console.log(url);
+			var reqObj;
+			reqObj = new XMLHttpRequest();
+			reqObj.onreadystatechange = function() {
+				if (reqObj.readyState == 4 && reqObj.status == 200) {
+					var link = reqObj.responseText;
+					document.getElementById("videoLink").src = link;
+					linkParts = link.split(".");
+					document.getElementById("videoLink").type = "video/" + linkParts[linkParts.length -1];
+					console.log(document.getElementById("videoLink").src);
+					console.log(reqObj.responseText);
+				}
+			};
+			reqObj.open("GET", url, true);
+			reqObj.send();
+
+			document.getElementById("shadow").style.display = "block";
+			document.getElementById("vidBox").style.display = "block";
+		};
+	};
+
+	document.getElementById("shadow").onclick = function() {
+		document.getElementById("vidBox").style.display = "none";
+		this.style.display = "none";
+	};
+	</script>
 {%- endblock %}
