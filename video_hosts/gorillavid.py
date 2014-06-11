@@ -10,6 +10,8 @@ import urllib.request
 id = "gorillavid"
 domain = "gorillavid.in"
 
+vidType = "html5"
+
 FNAME_RE = re.compile(r"file: \"(.+?/video.(?:mp4|flv))\",")
 
 # Send POST to http://gorillavid.in/videoID

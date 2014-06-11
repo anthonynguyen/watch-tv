@@ -27,6 +27,8 @@ app = Flask(__name__)
 directoryList = []
 vidHostList = []
 
+html5VidHosts = []
+
 
 defaultArt = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAMAAABlASxnAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAASUExURczMzFVVVf7+/qmpqX19feXl5WEFUTsAAAKCSURBVHja7dztTuMwEAVQJ2O//ytvSRGULWQnacJKmXN+IRUqceU7jfPR1gAAAAAAAAAAAAAAAAAAgNr6Sb97SZFPoMewtNKxjqGIyd+bmqxaRLKEs6ySS0sJN8z4qVlY2SIqYb6ISrihiF0JH1u2/nKXVbaISrihiKZ7fmmFEqbTUsINB1tKmF9aSrhhxjvZkD/YUsJ8EU33DUVUwnwRlTBfRCXcUEQlzC8tJcynpYQbdj1dCdNLSwk3zHglTBWxvwl3Nvx7XU2feggkl5S81kf79J0umHRWN6LJZyWt53n1c1aa+GTMPyt5EBErXdvrqp+XMZ2i3Ax/aW1dMqzpJLOwhCUsYf1SWL2/n5D51vJa9bD629HR+DgOHSvur68eo107rLjns+kA/+Yjrv4ec1QIa+f+JZ7+vkBYu++4euzdchmoQFi7z64/hHWrZJQIa/f1wP4Z1j3zAmGNA8Lqy9sUCGv3PxePbzDmJqxkWFHj07AfEVaVAX9IWFUGfB+vvsN9ZbUKYcURYVUZ8MeEVWTAx0E1DGElw5qKhNUM+F8O623ACysfVlPDzE56/vqOwhKWsP7LzIrlApGwMitr+SGElVlZ8b4jF1Y6rGm23cmvLGGlBvwys5qwkp+GEWN21iG53VnulRBWcm9Y46B0/zn4EJaw1sI66Lphd0U6F9ZUZbsz7a5h/+sIfggrH9Zc4f6sl8NqZbY7R9z5F8unaoUa9gNuk7yZK2x3dg+t+BJWje3Oci35lZH18dBc1Hgc5eERlLYWXbTP51I8u+NBJ2EJS1jCuoCznr6/ZFgnfa/DuOjX3Z3xjSHjsl8NOJ+gAQAAAAAAAAAAAAAAAAAA8J0/uz0RyXTAZWUAAAAASUVORK5CYII="
 defaultPoster = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAHCCAMAAABi7QS1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzFZWVvn5+ZaWljBNENAAAAJySURBVHja7dzJbiMxDEBBtfT//xzH+xab6qidQKxCjp7DPJCCvJYCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAhNpGj50zVut4aDVa0Qcu1SIu4ceJFV1ESxgfLUvYUcsSxhfREsZHa7eEYkVHyxLGL1uWsGMRDVZ8EbWKL6Il7FhEgxVfRK3io2UJO2oZrPgiLgYrPFqWsKOWJYxftgxWfLS06jjjLWF8EQ1WfBG16lhESxhfRIPVsYje+4pt4p4lfB9quWhNkBeplnt6hVPtCfPsYP+JNPFWakV38HBwyXOvvmDXBtFKrW1aTXqkbRRrzieRYokl1j+N1a6V09+JWMdXE57dPk9/D5fSF93mjlVW3Mp3Bc+52qlhhlgr/3fnWOfSCWKtfifiOnYTKxyr7W/uCWKVAbGWLLFW/+fazWSVKlYs1vfFw2RFY2U54AetYYoz6xefYch3wA+JleWAHxIrywE/KFaOA76MWsMUscqAWFkO+OKA//BkfZ/w1tABL5ZYYk0Ya/++mVihWO3wiRCxArGOr9WI1RGrusFH1vD4jNxkhc+sIlbw6tBa9eJf+J7lxT+XUrH+IlbLF8v7hh+OtWR5ujMgVp4b/PqLllirRjPN0531X7ZZbp/u1OpjktFDz6eVI0dWqnvW2j18+PctyddRLt8/eTtP5d0XU3zRyRedxBJLLLHSx5r0F9w2+l2HSX9QpG0wV/P+glvdQAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBEvgDxkA6cfrJoMQAAAABJRU5ErkJggg=="
@@ -281,7 +283,7 @@ def episode(episodeID):
 	else:
 		showTitle = nameFromSlug(showID)
 	
-	return render_template("episode.html", name = showTitle, season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info)
+	return render_template("episode.html", name = showTitle, season = season, episodeNum = episodeNum, links = results, hasInfo = (not episodeInfo[showID] is None) , info = info, html5VidHosts = html5VidHosts)
 
 @app.route("/resolve", methods = ["GET"])
 def resolve():
@@ -323,7 +325,10 @@ def initBackends():
 def initVidHosts():
 	for importer, mod, isPkg in pkgutil.iter_modules(video_hosts.__path__):
 		try:
-			vidHostList.append(importlib.import_module("video_hosts." + mod))
+			vidHost = importlib.import_module("video_hosts." + mod)
+			vidHostList.append(vidHost)
+			if vidHost.vidType == "html5":
+				html5VidHosts.append(vidHost.domain)
 			print("Imported video host: {}".format(mod))
 		except:
 			print("Failed to import video host: {}".format(mod))

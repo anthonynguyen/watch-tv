@@ -14,7 +14,7 @@
 	<div id="episode-links" class="bb">
 	{% for source, list in links.items() %}
 		{% for provider, ids in list.items() %}
-			<h2>{{ provider }}</h2>
+			<h2>{{ provider }}{% if provider in html5VidHosts %} - html5{% else %} - flash{% endif %}</h2>
 			<ul>
 			{% for id in ids %}
 			<li><a href="/resolve?id={{source}}{{ id }}">{{ id }}</a></li>

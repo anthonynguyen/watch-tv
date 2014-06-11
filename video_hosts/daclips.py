@@ -10,6 +10,8 @@ import urllib.request
 id = "daclips"
 domain = "daclips.in"
 
+vidType = "html5"
+
 FNAME_RE = re.compile(r"{ file: \"(.+?)\", type:\"video\" }")
 
 # Send POST to http://daclips.in/videoID

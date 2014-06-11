@@ -12,6 +12,8 @@ import urllib.request
 id = "movshare"
 domain = "movshare.net"
 
+vidType = "flash"
+
 FKEY_RE = re.compile(r"flashvars\.filekey=\"(.+?)\";")
 
 def getVid(videoID):
