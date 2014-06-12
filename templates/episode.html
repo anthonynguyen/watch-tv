@@ -47,12 +47,7 @@
 			reqObj = new XMLHttpRequest();
 			reqObj.onreadystatechange = function() {
 				if (reqObj.readyState == 4 && reqObj.status == 200) {
-					var link = reqObj.responseText;
-					document.getElementById("videoLink").src = link;
-					linkParts = link.split(".");
-					document.getElementById("videoLink").type = "video/" + linkParts[linkParts.length -1];
-					console.log(document.getElementById("videoLink").src);
-					console.log(reqObj.responseText);
+					document.getElementById("vidVid").src = reqObj.responseText;
 				}
 			};
 			reqObj.open("GET", url, true);
